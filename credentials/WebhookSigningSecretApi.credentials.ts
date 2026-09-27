@@ -1,12 +1,6 @@
 import type { ICredentialType, INodeProperties, Icon } from 'n8n-workflow';
 
-/**
- * Holds the shared secret(s) a webhook provider signs requests with.
- *
- * There is no `test` request: a signing secret is only ever used locally to
- * compute an HMAC, so there is no API endpoint that could confirm it. The node
- * provides a local check instead (see `testedBy` in VerifyWebhookSignature).
- */
+// No `test` request: nothing remote can confirm a signing secret. See `testedBy` in the node.
 export class WebhookSigningSecretApi implements ICredentialType {
 	name = 'webhookSigningSecretApi';
 

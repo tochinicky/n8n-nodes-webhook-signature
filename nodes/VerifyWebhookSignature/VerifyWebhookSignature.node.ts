@@ -20,7 +20,6 @@ import type {
 } from './types';
 import { verify } from './verify';
 
-/** Reads a dot-separated path such as `headers` or `request.headers` from item JSON. */
 function getPath(json: IDataObject, path: string): unknown {
 	let current: unknown = json;
 	for (const key of path.split('.').filter((k) => k !== '')) {
@@ -179,7 +178,8 @@ export class VerifyWebhookSignature implements INodeType {
 					{
 						name: 'Route to Invalid Output',
 						value: 'route',
-						description: 'Send the item to the Invalid output so the workflow can respond, e.g. with a 401',
+						description:
+							'Send the item to the Invalid output so the workflow can respond, e.g. with a 401',
 					},
 					{
 						name: 'Stop Workflow With Error',
@@ -219,11 +219,7 @@ export class VerifyWebhookSignature implements INodeType {
 
 	methods = {
 		credentialTest: {
-			/**
-			 * A signing secret has no API to test against, so this checks what can be
-			 * checked locally: that a secret is set and has no stray whitespace from
-			 * copy-pasting, which would make every signature fail to match.
-			 */
+			// There is no API to test a signing secret against, so only check it locally.
 			async webhookSigningSecretTest(
 				this: ICredentialTestFunctions,
 				credential: ICredentialsDecrypted,
@@ -263,7 +259,10 @@ export class VerifyWebhookSignature implements INodeType {
 			secondary: String(credentials.secondarySecret ?? '') || undefined,
 		};
 		if (secrets.primary === '') {
-			throw new NodeOperationError(this.getNode(), 'The Webhook Signing Secret credential has no secret set');
+			throw new NodeOperationError(
+				this.getNode(),
+				'The Webhook Signing Secret credential has no secret set',
+			);
 		}
 
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {

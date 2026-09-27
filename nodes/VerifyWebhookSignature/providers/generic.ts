@@ -1,14 +1,6 @@
 import { getHeader, parseTimestamp } from '../headers';
 import type { GenericOptions, Headers, ParseResult } from '../types';
 
-/**
- * Generic HMAC: everything comes from the node's parameters.
- *
- * The template is expanded around the raw body bytes rather than by string
- * replacement on a decoded body, so a non-UTF-8 body is signed exactly as it
- * arrived. `{timestamp}` is substituted first; `{body}` may appear any number
- * of times (normally once).
- */
 export function parseGeneric(
 	headers: Headers,
 	rawBody: Buffer,
@@ -38,6 +30,7 @@ export function parseGeneric(
 		timestampText = timestampHeader.value.trim();
 	}
 
+	// Splice the raw bytes in rather than decoding the body, so non-UTF-8 bodies still verify.
 	const pieces = options.payloadTemplate.split('{timestamp}').join(timestampText).split('{body}');
 	const parts: Buffer[] = [];
 	pieces.forEach((piece, index) => {

@@ -3,15 +3,7 @@ import type { Headers, ParseResult } from '../types';
 
 const PREFIX = 'v0=';
 
-/**
- * Slack: `X-Slack-Signature: v0=<hex>` and `X-Slack-Request-Timestamp: <unix seconds>`
- *
- * The base string is `v0:${timestamp}:${rawBody}`, HMAC-SHA256 keyed with the
- * app's signing secret, hex encoded. Slack asks receivers to reject requests
- * more than five minutes from local time.
- *
- * https://docs.slack.dev/authentication/verifying-requests-from-slack
- */
+// https://docs.slack.dev/authentication/verifying-requests-from-slack
 export function parseSlack(headers: Headers, rawBody: Buffer): ParseResult {
 	const signature = getHeader(headers, 'x-slack-signature');
 	if (signature.status === 'missing') return { ok: false, reason: 'missing_header' };

@@ -45,12 +45,7 @@ function parse(
 	}
 }
 
-/**
- * Compares two signatures without leaking, through timing, how many leading
- * characters matched. `timingSafeEqual` throws on unequal lengths, so lengths
- * are checked first; the length of a signature is public, so that early return
- * reveals nothing an attacker doesn't already know.
- */
+// timingSafeEqual throws on unequal lengths. A signature's length is public, so returning early leaks nothing.
 export function constantTimeEqual(a: string, b: string): boolean {
 	const bufferA = Buffer.from(a, 'utf8');
 	const bufferB = Buffer.from(b, 'utf8');
@@ -58,7 +53,6 @@ export function constantTimeEqual(a: string, b: string): boolean {
 	return timingSafeEqual(bufferA, bufferB);
 }
 
-/** Which secret, if any, produced one of the signatures in the request. */
 function findMatchingSecret(
 	request: SignedRequest,
 	secrets: Secrets,
@@ -66,8 +60,7 @@ function findMatchingSecret(
 	const toTry: Array<['primary' | 'secondary', string]> = [['primary', secrets.primary]];
 	if (secrets.secondary) toTry.push(['secondary', secrets.secondary]);
 
-	// Hex is case-insensitive, and every provider here emits lowercase.
-	// Base64 is case-sensitive, so it is compared exactly as sent.
+	// Hex is case-insensitive; Base64 is not.
 	const candidates =
 		request.encoding === 'hex'
 			? request.candidates.map((c) => c.trim().toLowerCase())
@@ -99,16 +92,8 @@ function result(
 	};
 }
 
-/**
- * Verifies one webhook request. Pure: no n8n, no I/O, and the clock is passed
- * in, so every case can be unit-tested with fixed inputs.
- *
- * Order of checks, following Stripe's documented procedure: parse the headers,
- * check the signature, then check the timestamp. Checking the signature first
- * means `timestamp_outside_tolerance` is only ever reported for a request that
- * was genuinely signed by the provider, which makes it a useful signal (a
- * replay, or clock drift) rather than noise from forged requests.
- */
+// Signature is checked before the timestamp (Stripe's documented order), so
+// timestamp_outside_tolerance only ever describes a genuinely signed request.
 export function verify(
 	provider: Provider,
 	rawBody: Buffer | null,

@@ -6,7 +6,6 @@ import { FAKE_PRIMARY, hmac } from './helpers';
 
 const body = '{"action":"opened"}';
 
-/** An item shaped like the n8n Webhook node's output with Raw Body turned on. */
 function webhookItem(headers: Record<string, string>, withRawBody = true): INodeExecutionData {
 	return {
 		json: { headers, params: {}, query: {}, body: JSON.parse(body) },
@@ -16,10 +15,6 @@ function webhookItem(headers: Record<string, string>, withRawBody = true): INode
 	};
 }
 
-/**
- * The smallest IExecuteFunctions the node touches. Parameters not listed fall
- * back to the default the node passes, just as n8n does.
- */
 function fakeContext(
 	items: INodeExecutionData[],
 	parameters: Record<string, unknown>,
@@ -68,7 +63,9 @@ describe('VerifyWebhookSignature node', () => {
 	});
 
 	it('marks the item invalid when Raw Body was not enabled', async () => {
-		const [valid, invalid] = await node.execute.call(fakeContext([webhookItem(signedHeaders, false)], github));
+		const [valid, invalid] = await node.execute.call(
+			fakeContext([webhookItem(signedHeaders, false)], github),
+		);
 		expect(valid).toHaveLength(0);
 		expect(invalid[0].json.signatureVerification).toMatchObject({ reason: 'raw_body_missing' });
 	});
@@ -79,7 +76,11 @@ describe('VerifyWebhookSignature node', () => {
 	});
 
 	it('routes to Invalid instead of throwing when Continue On Fail is on', async () => {
-		const context = fakeContext([webhookItem(forgedHeaders)], { ...github, onInvalid: 'error' }, true);
+		const context = fakeContext(
+			[webhookItem(forgedHeaders)],
+			{ ...github, onInvalid: 'error' },
+			true,
+		);
 		const [valid, invalid] = await node.execute.call(context);
 		expect(valid).toHaveLength(0);
 		expect(invalid).toHaveLength(1);
@@ -88,9 +89,14 @@ describe('VerifyWebhookSignature node', () => {
 	it('reads headers and raw body from custom locations', async () => {
 		const item: INodeExecutionData = {
 			json: { request: { headers: signedHeaders } },
-			binary: { rawBody: { data: Buffer.from(body).toString('base64'), mimeType: 'application/json' } },
+			binary: {
+				rawBody: { data: Buffer.from(body).toString('base64'), mimeType: 'application/json' },
+			},
 		};
-		const parameters = { ...github, options: { headersField: 'request.headers', rawBodyProperty: 'rawBody' } };
+		const parameters = {
+			...github,
+			options: { headersField: 'request.headers', rawBodyProperty: 'rawBody' },
+		};
 		const [valid] = await node.execute.call(fakeContext([item], parameters));
 		expect(valid).toHaveLength(1);
 	});

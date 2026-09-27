@@ -1,16 +1,9 @@
 import { getHeader, parseTimestamp } from '../headers';
 import type { Headers, ParseResult } from '../types';
 
-/**
- * Stripe: `Stripe-Signature: t=1492774577,v1=<hex>,v1=<hex>,v0=<hex>`
- *
- * The signed payload is `${t}.${rawBody}`, HMAC-SHA256 keyed with the endpoint
- * secret (`whsec_...`) used as-is. While an endpoint secret is being rolled,
- * Stripe sends one `v1` per active secret, so any of them may match. `v0` is a
- * test-mode-only scheme and is ignored.
- *
- * https://docs.stripe.com/webhooks#verify-manually
- */
+// `Stripe-Signature: t=<unix>,v1=<hex>[,v1=<hex>...]`. Stripe sends one v1 per active
+// secret while one is being rolled; v0 is test-mode only and ignored.
+// https://docs.stripe.com/webhooks#verify-manually
 export function parseStripe(headers: Headers, rawBody: Buffer): ParseResult {
 	const header = getHeader(headers, 'stripe-signature');
 	if (header.status === 'missing') return { ok: false, reason: 'missing_header' };
