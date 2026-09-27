@@ -49,8 +49,6 @@ A signature covers the **exact bytes** the provider sent. Once n8n parses the bo
 
 In the **Webhook** node, go to **Options → Add Option → Raw Body** and switch it on.
 
-<!-- Screenshot: docs/screenshots/webhook-raw-body.png -->
-
 With Raw Body on, the Webhook node (v2.x) stores the request bytes as binary data in the property `data`, and the request headers under `headers` in the JSON. Those are this node's defaults. Both can be changed under **Options** (useful if the data has been moved by other nodes first).
 
 If the raw body is missing, the node **does not** fall back to re-serialising the JSON. That would only ever produce false failures. It reports `raw_body_missing` instead.
@@ -182,7 +180,15 @@ curl -i -X POST http://localhost:5678/webhook/github-events \
   --data-raw '{"action":"opened","number":2}'
 ```
 
-<!-- Screenshots: docs/screenshots/execution-valid.png, docs/screenshots/execution-invalid.png -->
+Both requests, run against a local n8n (`npm run dev`):
+
+| Correctly signed → **Valid** → 200 | Tampered body → **Invalid** → 401 |
+|---|---|
+| ![Valid execution](docs/screenshots/execution-valid.jpg) | ![Invalid execution](docs/screenshots/execution-invalid.jpg) |
+
+The same JSON re-sent with different whitespace is also rejected (`signature_mismatch`), which confirms the node checks the raw bytes and not the parsed body.
+
+> **Note for `npm run dev`:** in dev mode n8n loads this node as `CUSTOM.verifyWebhookSignature`. The example workflow uses the type an npm install registers, `n8n-nodes-webhook-signature.verifyWebhookSignature`. To import the example into a dev instance, replace that type first.
 
 ## Development
 
