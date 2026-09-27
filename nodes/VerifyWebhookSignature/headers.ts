@@ -20,9 +20,11 @@ export function getHeader(headers: Headers, name: string): HeaderLookup {
 
 	if (value === undefined || value === '') return { status: 'missing' };
 	if (Array.isArray(value)) {
-		if (value.length !== 1) return { status: 'malformed' };
+		if (value.length !== 1 || typeof value[0] !== 'string') return { status: 'malformed' };
 		return value[0] === '' ? { status: 'missing' } : { status: 'ok', value: value[0] };
 	}
+	// Headers can come from any earlier node's JSON, so don't trust the type.
+	if (typeof value !== 'string') return { status: 'malformed' };
 	return { status: 'ok', value };
 }
 

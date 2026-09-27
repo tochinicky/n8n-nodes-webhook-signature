@@ -239,6 +239,12 @@ describe('safety', () => {
 		expect(result.reason).toBe('malformed_header');
 	});
 
+	it('treats a non-string header value as malformed instead of crashing', () => {
+		const headers = { 'x-hub-signature-256': 12345 } as unknown as Record<string, string>;
+		const result = verify('github', raw, headers, { primary: FAKE_PRIMARY }, TOLERANCE, NOW);
+		expect(result.reason).toBe('malformed_header');
+	});
+
 	it('reports raw_body_missing instead of guessing', () => {
 		const result = verify('github', null, {}, { primary: FAKE_PRIMARY }, TOLERANCE, NOW);
 		expect(result).toMatchObject({ valid: false, reason: 'raw_body_missing' });
