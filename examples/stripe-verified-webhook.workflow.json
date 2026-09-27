@@ -1,0 +1,81 @@
+{
+	"name": "Stripe webhook with signature verification",
+	"nodes": [
+		{
+			"parameters": {
+				"httpMethod": "POST",
+				"path": "stripe-events",
+				"responseMode": "responseNode",
+				"options": {
+					"rawBody": true
+				}
+			},
+			"id": "0d7f7a52-1b8e-4f0e-9d53-4b8a7e6f1a01",
+			"name": "Stripe Webhook",
+			"type": "n8n-nodes-base.webhook",
+			"typeVersion": 2.1,
+			"position": [0, 0],
+			"webhookId": "5b1a4c1e-7a3f-4e57-9b43-2f5f0f2d8c11"
+		},
+		{
+			"parameters": {
+				"provider": "stripe",
+				"toleranceSeconds": 300,
+				"onInvalid": "route",
+				"options": {}
+			},
+			"id": "7c2e9d3a-3b1f-4c55-8d2a-9e6b1f4a7c02",
+			"name": "Verify Webhook Signature",
+			"type": "n8n-nodes-webhook-signature.verifyWebhookSignature",
+			"typeVersion": 1,
+			"position": [220, 0],
+			"credentials": {
+				"webhookSigningSecretApi": {
+					"id": "",
+					"name": "Stripe endpoint secret"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"respondWith": "json",
+				"responseBody": "={{ { \"received\": true, \"event\": $json.body.type } }}",
+				"options": {}
+			},
+			"id": "a41b6c7d-5e8f-4a90-b1c2-d3e4f5a6b703",
+			"name": "Accept (200)",
+			"type": "n8n-nodes-base.respondToWebhook",
+			"typeVersion": 1.5,
+			"position": [460, -100]
+		},
+		{
+			"parameters": {
+				"respondWith": "json",
+				"responseBody": "={{ { \"error\": \"invalid signature\", \"reason\": $json.signatureVerification.reason } }}",
+				"options": {
+					"responseCode": 401
+				}
+			},
+			"id": "b52c7d8e-6f90-4ba1-c2d3-e4f5a6b7c804",
+			"name": "Reject (401)",
+			"type": "n8n-nodes-base.respondToWebhook",
+			"typeVersion": 1.5,
+			"position": [460, 100]
+		}
+	],
+	"connections": {
+		"Stripe Webhook": {
+			"main": [[{ "node": "Verify Webhook Signature", "type": "main", "index": 0 }]]
+		},
+		"Verify Webhook Signature": {
+			"main": [
+				[{ "node": "Accept (200)", "type": "main", "index": 0 }],
+				[{ "node": "Reject (401)", "type": "main", "index": 0 }]
+			]
+		}
+	},
+	"settings": {
+		"executionOrder": "v1"
+	},
+	"pinData": {}
+}
