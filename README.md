@@ -186,9 +186,10 @@ curl -i -X POST http://localhost:5678/webhook/github-events \
 
 ## Development
 
-Requires Node.js 20.19+ or 22+.
+Use Node.js 24 (`.nvmrc` pins it). `npm run dev` starts the latest n8n, which requires Node 24+, and at the time of writing its SQLite driver has no build for Node 26.
 
 ```bash
+nvm use
 npm install
 npm run build   # n8n-node build
 npm run lint    # n8n's community-node lint rules (strict mode)
