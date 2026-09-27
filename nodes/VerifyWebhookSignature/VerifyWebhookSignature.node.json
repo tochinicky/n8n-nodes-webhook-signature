@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-webhook-signature.verifyWebhookSignature",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Development", "Developer Tools"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/tochinicky/n8n-nodes-webhook-signature#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/tochinicky/n8n-nodes-webhook-signature#readme"
+			}
+		]
+	}
+}
