@@ -29,9 +29,6 @@ function getPath(json: IDataObject, path: string): unknown {
 	return current;
 }
 
-// usableAsTool is deliberately not set: this node needs the raw request body as
-// binary data, which an AI agent's tool call cannot provide.
-// eslint-disable-next-line @n8n/community-nodes/node-usable-as-tool
 export class VerifyWebhookSignature implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Verify Webhook Signature',
@@ -51,6 +48,7 @@ export class VerifyWebhookSignature implements INodeType {
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main, NodeConnectionTypes.Main],
 		outputNames: ['Valid', 'Invalid'],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'webhookSigningSecretApi',
