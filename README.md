@@ -36,7 +36,7 @@ This node does all four in one place, with the security details handled for you.
 
 ## Installation
 
-The npm package is **coming soon**. Once it's published:
+Published on npm as [`n8n-nodes-webhook-signature`](https://www.npmjs.com/package/n8n-nodes-webhook-signature), built and published from this repository by GitHub Actions with [npm provenance](https://docs.npmjs.com/generating-provenance-statements).
 
 1. In n8n, go to **Settings → Community Nodes → Install**.
 2. Enter `n8n-nodes-webhook-signature`.
